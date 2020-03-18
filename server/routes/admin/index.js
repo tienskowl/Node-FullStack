@@ -6,5 +6,9 @@ module.exports = app => {
     const model = await category.create(req.body);
     res.send(model);
   });
+  router.get('/categories', async (req, res) => {
+    const items = await category.find().limit(10);
+    res.send(items);
+  });
   app.use('/admin/api', router);
 };
