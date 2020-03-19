@@ -1,6 +1,7 @@
 module.exports = app => {
   const express = require('express');
   const router = express.Router();
+  // 托管静态文件
   router.post('/', async (req, res) => {
     const model = await req.Model.create(req.body);
     res.send(model);
@@ -41,4 +42,15 @@ module.exports = app => {
     },
     router
   );
+
+  // 上传图片的处理
+  const multer = require('multer');
+  // __dirname 绝对路径
+  const upload = multer({ dest: __dirname + '/../../uploads' });
+  // 先把文件传进去，然后返回给前端信息
+  app.post('/admin/api/upload', upload.single('file'), async (req, res) => {
+    const file = req.file;
+    file.url = `http://localhost:3000/uploads/${file.filename}`;
+    res.send(file);
+  });
 };
