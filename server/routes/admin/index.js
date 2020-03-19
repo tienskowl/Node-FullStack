@@ -6,8 +6,12 @@ module.exports = app => {
     const model = await category.create(req.body);
     res.send(model);
   });
+  // 返回数据时将父级分类也返回
   router.get('/categories', async (req, res) => {
-    const items = await category.find().limit(10);
+    const items = await category
+      .find()
+      .populate('parent')
+      .limit(10);
     res.send(items);
   });
   router.get('/categories/:id', async (req, res) => {
