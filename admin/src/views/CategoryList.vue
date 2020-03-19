@@ -11,8 +11,11 @@
             type="text"
             size="small"
             @click="$router.push(`/categories/edit/${scope.row._id}`)"
-          >编辑</el-button>
-          <el-button type="text" size="small" @click="open(scope.row)">删除</el-button>
+            >编辑</el-button
+          >
+          <el-button type="text" size="small" @click="open(scope.row)"
+            >删除</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -28,29 +31,29 @@ export default {
   },
   methods: {
     async fetch() {
-      const res = await this.$http.get("categories");
+      const res = await this.$http.get('rest/categories');
       this.items = res.data;
     },
     // 弹出删除确定对话框
     open(row) {
-      this.$confirm("此操作将永久删除该分类, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
+      this.$confirm('此操作将永久删除该分类, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       })
         .then(async () => {
-          await this.$http.delete(`categories/${row._id}`);
+          await this.$http.delete(`rest/categories/${row._id}`);
           this.$message({
-            type: "success",
-            message: "删除成功!"
+            type: 'success',
+            message: '删除成功!'
           });
           // 删除完成后重新获取数据
           this.fetch();
         })
         .catch(() => {
           this.$message({
-            type: "info",
-            message: "已取消删除"
+            type: 'info',
+            message: '已取消删除'
           });
         });
     }
