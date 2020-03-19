@@ -1,6 +1,6 @@
 <template>
   <div class="about">
-    <h1>创建分类</h1>
+    <h1>{{ this.id ? '编辑' : '新建' }}分类</h1>
     <el-form label-width="120px" @submit.native.prevent="save">
       <el-form-item label="名称">
         <el-input v-model="model.name"></el-input>
@@ -19,7 +19,13 @@ export default {
   },
   methods: {
     async save() {
-      const res = await this.$http.post('categories', this.model);
+      let res;
+      if (this.id) {
+        res = await this.$http.put(`categories/${this.id}`, this.model);
+      } else {
+        res = await this.$http.post('categories', this.model);
+      }
+
       if (res) {
         this.$router.push('/categories/list');
         this.$message({
@@ -27,7 +33,24 @@ export default {
           message: '保存成功'
         });
       }
+    },
+    // 获取查询结果
+    async fetch() {
+      const res = await this.$http.get(`/categories/${this.id}`);
+      this.model = res.data;
     }
+  },
+  // 在渲染组件时进行赋值
+  created() {
+    this.id && this.fetch();
+  },
+  props: { id: {} },
+  // 防止在edit时点击 新建分类 数据没有被清除！！
+  beforeRouteLeave(to, from, next) {
+    // 导航离开该组件的对应路由时调用
+    // 可以访问组件实例 `this`
+    this.model = {};
+    next();
   }
 };
 </script>

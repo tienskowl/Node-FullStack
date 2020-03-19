@@ -19,6 +19,11 @@ const routes = [
       {
         path: '/categories/list',
         component: CategoryList
+      },
+      {
+        path: '/categories/edit/:id',
+        component: CategoryEdit,
+        props: true
       }
     ]
   }
