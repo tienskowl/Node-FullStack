@@ -13,13 +13,21 @@ import AdList from '../views/AdList.vue';
 import AdEdit from '../views/AdEdit.vue';
 import AdminUserList from '../views/AdminUserList.vue';
 import AdminUserEdit from '../views/AdminUserEdit.vue';
+import Login from '../views/Login.vue';
 
 Vue.use(VueRouter);
 
 const routes = [
+  // 登陆页面
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login
+  },
+  // 主页面
   {
     path: '/',
-    name: 'Home',
+    name: 'Main',
     component: Main,
     children: [
       {

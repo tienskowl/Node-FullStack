@@ -53,4 +53,32 @@ module.exports = app => {
     file.url = `http://localhost:3000/uploads/${file.filename}`;
     res.send(file);
   });
+
+  // 登录
+  app.post('/admin/api/login', async (req, res) => {
+    const { username, password } = req.body;
+    // 根据用户名找用户
+    const User = require('../../models/AdminUser');
+    // 向数据库查询需要await
+    const model = await User.findOne({ username: username }).select(
+      '+password'
+      // 标识要取出password
+    );
+    if (!model) {
+      return res.status(422).send({
+        message: '用户不存在'
+      });
+    }
+    // 校验密码
+    const isValid = require('bcrypt').compareSync(password, model.password);
+    if (!isValid) {
+      return res.status(422).send({
+        message: '密码错误'
+      });
+    }
+    // 返回token  使用 jsonwebtoken 验证token
+    const jwt = require('jsonwebtoken');
+    const token = jwt.sign({ id: model._id }, app.get('secret'));
+    res.send({ token });
+  });
 };

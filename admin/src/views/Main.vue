@@ -94,7 +94,7 @@ export default {
       address: '上海市普陀区金沙江路 1518 弄'
     };
     return {
-      index: [],
+      index: ['1'],
       tableData: Array(20).fill(item)
     };
   }
