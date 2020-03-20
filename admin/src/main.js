@@ -7,6 +7,7 @@ Vue.config.productionTip = false;
 
 import http from './http';
 Vue.prototype.$http = http;
+import './views/style.css';
 
 new Vue({
   router,
