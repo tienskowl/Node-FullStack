@@ -1,49 +1,36 @@
 module.exports = app => {
   const express = require('express');
   const router = express.Router();
-  const jwt = require('jsonwebtoken');
-  const AdminUser = require('../../models/AdminUser');
   const assert = require('http-assert');
   router.post('/', async (req, res) => {
     const model = await req.Model.create(req.body);
     res.send(model);
   });
-  // 返回数据时将父级分类也返回  // 此处添加验证
-  router.get(
-    '/',
-    async (req, res, next) => {
-      const token = String(req.headers.authorization || '')
-        .split(' ')
-        .pop();
-      console.log(token);
-      assert(token, 401, '请先登录');
-      const { id } = jwt.verify(token, app.get('secret'));
-      assert(id, 401, '请先登录');
-      req.user = AdminUser.findById(id);
-      assert(req.user, 401, '请先登录');
 
-      await next();
-    },
-    async (req, res) => {
-      let queryOptions = {};
-      if (req.Model.modelName === 'Category') {
-        queryOptions.populate = 'parent';
-      }
-      const items = await req.Model.find()
-        .setOptions(queryOptions)
-        .limit(10);
-      res.send(items);
+  // 登录校验中间件
+  const authMiddleware = require('../../middleware/auth');
+  // 模型获取中间件
+  const modelMiddleware = require('../../middleware/model');
+  // 返回数据时将父级分类也返回  // 此处添加验证
+  router.get('/', authMiddleware(), async (req, res) => {
+    let queryOptions = {};
+    if (req.Model.modelName === 'Category') {
+      queryOptions.populate = 'parent';
     }
-  );
-  router.get('/:id', async (req, res) => {
+    const items = await req.Model.find()
+      .setOptions(queryOptions)
+      .limit(10);
+    res.send(items);
+  });
+  router.get('/:id', authMiddleware(), async (req, res) => {
     const model = await req.Model.findById(req.params.id);
     res.send(model);
   });
-  router.put('/:id', async (req, res) => {
+  router.put('/:id', authMiddleware(), async (req, res) => {
     const model = await req.Model.findByIdAndUpdate(req.params.id, req.body);
     res.send(model);
   });
-  router.delete('/:id', async (req, res) => {
+  router.delete('/:id', authMiddleware(), async (req, res) => {
     await req.Model.findByIdAndDelete(req.params.id, req.body);
     res.send({ sucess: true });
   });
@@ -51,26 +38,23 @@ module.exports = app => {
   // 生成统一接口
   // restful api
   // inflection 将复数转换为类名
-  app.use(
-    '/admin/api/rest/:resource',
-    async (req, res, next) => {
-      let modelName = require('inflection').classify(req.params.resource);
-      req.Model = require(`../../models/${modelName}`);
-      next();
-    },
-    router
-  );
+  app.use('/admin/api/rest/:resource', modelMiddleware(), router);
 
   // 上传图片的处理
   const multer = require('multer');
   // __dirname 绝对路径
   const upload = multer({ dest: __dirname + '/../../uploads' });
   // 先把文件传进去，然后返回给前端信息
-  app.post('/admin/api/upload', upload.single('file'), async (req, res) => {
-    const file = req.file;
-    file.url = `http://localhost:3000/uploads/${file.filename}`;
-    res.send(file);
-  });
+  app.post(
+    '/admin/api/upload',
+    authMiddleware(),
+    upload.single('file'),
+    async (req, res) => {
+      const file = req.file;
+      file.url = `http://localhost:3000/uploads/${file.filename}`;
+      res.send(file);
+    }
+  );
 
   // 登录
   app.post('/admin/api/login', async (req, res) => {
