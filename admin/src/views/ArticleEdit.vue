@@ -16,11 +16,7 @@
         <el-input v-model="model.title"></el-input>
       </el-form-item>
       <el-form-item label="详情">
-        <vue-editor
-          useCustomImageHandler
-          @image-added="uploadFile"
-          v-model="model.body"
-        ></vue-editor>
+        <vue-editor useCustomImageHandler @image-added="uploadFile" v-model="model.body"></vue-editor>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" native-type="submit">保存</el-button>
@@ -30,7 +26,7 @@
 </template>
 
 <script>
-import { VueEditor } from 'vue2-editor';
+import { VueEditor } from "vue2-editor";
 
 export default {
   data() {
@@ -42,14 +38,14 @@ export default {
       if (this.id) {
         res = await this.$http.put(`rest/articles/${this.id}`, this.model);
       } else {
-        res = await this.$http.post('rest/articles', this.model);
+        res = await this.$http.post("rest/articles", this.model);
       }
 
       if (res) {
-        this.$router.push('/articles/list');
+        this.$router.push("/articles/list");
         this.$message({
-          type: 'success',
-          message: '保存成功'
+          type: "success",
+          message: "保存成功"
         });
       }
     },
@@ -59,8 +55,12 @@ export default {
       this.model = res.data;
     },
     async fetchCategories() {
-      const res = await this.$http.get('rest/categories');
-      this.categories = res.data;
+      const res = await this.$http.get("rest/categories");
+      res.data.forEach(element => {
+        if (element.parent && element.parent.name == "news") {
+          this.categories.push(element);
+        }
+      });
     },
     async uploadFile(file, Editor, cursorLocation, resetUploader) {
       // An example of using FormData
@@ -68,10 +68,10 @@ export default {
       // formData.append('file', file)
 
       var formData = new FormData();
-      formData.append('file', file);
+      formData.append("file", file);
 
-      let res = await this.$http.post('upload', formData);
-      Editor.insertEmbed(cursorLocation, 'image', res.data.url);
+      let res = await this.$http.post("upload", formData);
+      Editor.insertEmbed(cursorLocation, "image", res.data.url);
       resetUploader();
     }
   },

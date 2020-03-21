@@ -147,7 +147,11 @@ export default {
     },
     async fetchCategories() {
       const res = await this.$http.get(`rest/categories`);
-      this.categories = res.data;
+      res.data.forEach(element => {
+        if (element.parent && element.parent.name == "heroes") {
+          this.categories.push(element);
+        }
+      });
     },
     async fetchItems() {
       const res = await this.$http.get(`rest/items`);
