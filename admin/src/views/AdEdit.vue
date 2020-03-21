@@ -17,7 +17,8 @@
             <el-form-item label="图片" style="margin-top:1rem">
               <el-upload
                 class="avatar-uploader"
-                :action="$http.defaults.baseURL + '/upload'"
+                :action="getPostUrl"
+                :headers="getAuthrizationHeader"
                 :show-file-list="false"
                 :on-success="res => $set(item, 'image', res.url)"
               >
@@ -26,12 +27,7 @@
               </el-upload>
             </el-form-item>
             <el-form-item>
-              <el-button
-                size="small"
-                type="danger"
-                @click="model.items.splice(i, 1)"
-                >删除</el-button
-              >
+              <el-button size="small" type="danger" @click="model.items.splice(i, 1)">删除</el-button>
             </el-form-item>
           </el-col>
         </el-row>
@@ -58,14 +54,14 @@ export default {
       if (this.id) {
         res = await this.$http.put(`rest/ads/${this.id}`, this.model);
       } else {
-        res = await this.$http.post('rest/ads', this.model);
+        res = await this.$http.post("rest/ads", this.model);
       }
 
       if (res) {
-        this.$router.push('/ads/list');
+        this.$router.push("/ads/list");
         this.$message({
-          type: 'success',
-          message: '保存成功'
+          type: "success",
+          message: "保存成功"
         });
       }
     },
@@ -75,7 +71,7 @@ export default {
       this.model = { ...this.model, ...res.data };
     },
     async fetchParents() {
-      const res = await this.$http.get('rest/ads');
+      const res = await this.$http.get("rest/ads");
       this.parents = res.data;
     }
   },

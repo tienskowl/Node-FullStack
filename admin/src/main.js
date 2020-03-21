@@ -9,6 +9,19 @@ import http from './http';
 Vue.prototype.$http = http;
 import './views/style.css';
 
+Vue.mixin({
+  computed: {
+    getPostUrl() {
+      return this.$http.defaults.baseURL + '/upload';
+    }
+  },
+  methods: {
+    getAuthrizationHeader() {
+      return `Bearer ${localStorage.token}`;
+    }
+  }
+});
+
 new Vue({
   router,
   render: h => h(App)

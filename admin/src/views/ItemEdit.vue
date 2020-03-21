@@ -8,7 +8,8 @@
       <el-form-item label="图标">
         <el-upload
           class="avatar-uploader"
-          :action="$http.defaults.baseURL + '/upload'"
+          :action="getPostUrl"
+          :headers="getAuthrizationHeader()"
           :show-file-list="false"
           :on-success="afterUpload"
         >
@@ -34,14 +35,14 @@ export default {
       if (this.id) {
         res = await this.$http.put(`rest/items/${this.id}`, this.model);
       } else {
-        res = await this.$http.post('rest/items', this.model);
+        res = await this.$http.post("rest/items", this.model);
       }
 
       if (res) {
-        this.$router.push('/items/list');
+        this.$router.push("/items/list");
         this.$message({
-          type: 'success',
-          message: '保存成功'
+          type: "success",
+          message: "保存成功"
         });
       }
     },
@@ -55,7 +56,7 @@ export default {
       // this.model.icon = res.url;
 
       // 使用vue自带的$set显式赋值
-      this.$set(this.model, 'icon', res.url);
+      this.$set(this.model, "icon", res.url);
     }
   },
   // 在渲染组件时进行赋值
