@@ -18,11 +18,15 @@ import Login from '../views/Login.vue';
 Vue.use(VueRouter);
 
 const routes = [
+  // 客户端要对访问进行鉴权
+  // 使用 导航守卫
   // 登陆页面
   {
     path: '/login',
     name: 'Login',
-    component: Login
+    component: Login,
+    // 通过该元数据进行鉴权
+    meta: { isPublic: true }
   },
   // 主页面
   {
@@ -114,6 +118,13 @@ const routes = [
 
 const router = new VueRouter({
   routes
+});
+
+router.beforeEach((to, from, next) => {
+  if (!to.meta.isPublic && !localStorage.token) {
+    return next('/login');
+  }
+  next();
 });
 
 export default router;
